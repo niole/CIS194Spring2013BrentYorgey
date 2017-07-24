@@ -1,4 +1,7 @@
+module JoinList where
+
 import Sized
+
 --primitive word processing engine for Charles Dickens
 --tracks total words while document in progress
 --Buffer acts as the interface between BE and FE
@@ -46,13 +49,28 @@ x = (+++) ( (+++) (Single (Size 1) "a") (Single (Size 1) "b")) ((+++) (Single (S
 
 dropJ :: (Sized b, Monoid b) => Int -> JoinList b a -> JoinList b a
 dropJ _ Empty = Empty
-dropJ _ (Single a b) = Single a b
+dropJ n (Single a b)
+        | n > 0 = Empty
+        | otherwise = Single a b
 dropJ n (Append s left right) = let sizeL = getSize $ size $ tag left
-                                    sizeR = getSize $ size $ tag right
                                     sizeS = getSize $ size s
                                 in case () of
-                                  _ | (n - sizeS) == 0 -> Empty
-                                    | (n - sizeL) == 0 -> right
-                                    | (n - sizeL) < 0 -> Append s (dropJ n left) right --recurse into left
+                                  _ | n == sizeS -> Empty
+                                    | n <= sizeL ->  (dropJ n left) +++ right --recurse into left
                                     | otherwise -> dropJ (n - sizeL) right --modify n and go right
+--3
 
+
+takeJ :: (Sized b, Monoid b) => Int -> JoinList b a -> JoinList b a
+takeJ _ Empty = Empty
+takeJ n (Single a b)
+        | n > 0 = Single a b
+        | otherwise = Empty
+takeJ n (Append s left right) = let sizeL = getSize $ size $ tag left
+                                    sizeS = getSize $ size s
+                                in case () of
+                                  _ | n == sizeS -> Append s left right
+                                    | sizeL >= n -> takeJ n left
+                                    | otherwise -> left +++ (takeJ (n - sizeL) right)
+
+--E4
