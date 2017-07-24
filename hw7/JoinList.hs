@@ -1,7 +1,11 @@
+{-# LANGUAGE FlexibleInstances #-}
+
 module JoinList where
 
+import Editor
 import Sized
 import Scrabble
+import Buffer
 
 --primitive word processing engine for Charles Dickens
 --tracks total words while document in progress
@@ -78,3 +82,27 @@ scoreLine :: String -> JoinList Score String
 scoreLine s = Single (scoreString s) s
 
 --E4
+
+instance Buffer (JoinList (Score, Size) String) where
+  toString a = case a of
+                Empty -> ""
+                Single _ b -> b
+                Append s left right -> (toString left) ++ toString right
+
+  fromString s = Single (scoreString s, Size 1) s
+
+  line index t = indexJ index t
+
+  replaceLine index ln t
+        | index == 0 = (fromString ln) +++ (dropJ (index + 1) t)
+        | otherwise =
+          (takeJ (index - 1) t) +++ (fromString ln) +++ (dropJ (index + 1) t)
+
+  numLines t = length $ jlToList t
+
+  value t = case t of
+            Empty -> 0
+            Single (Score s, _) _ -> s
+            Append (Score s, _) _ _ -> s
+
+main = runEditor editor $ (Single (scoreString "cat", Size 1) "cat") +++ (Single (scoreString "bl", Size 1) "bl") +++ (Single (scoreString "blah", Size 1) "blah") +++ (Single (scoreString "you", Size 1) "you") +++ (Single (scoreString "hey", Size 1) "hey")

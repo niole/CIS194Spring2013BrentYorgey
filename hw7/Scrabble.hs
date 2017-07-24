@@ -15,7 +15,8 @@ instance Monoid Score where
 --scores according to letterScores
 score :: Char -> Score
 score = helper letterScores
-        where helper ((chr, s) : scores) c
+        where helper [] _ = 0
+              helper ((chr, s) : scores) c
                 | chr == c = Score s
                 | otherwise = helper scores c
 
