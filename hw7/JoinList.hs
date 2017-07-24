@@ -1,6 +1,7 @@
 module JoinList where
 
 import Sized
+import Scrabble
 
 --primitive word processing engine for Charles Dickens
 --tracks total words while document in progress
@@ -72,5 +73,8 @@ takeJ n (Append s left right) = let sizeL = getSize $ size $ tag left
                                   _ | n == sizeS -> Append s left right
                                     | sizeL >= n -> takeJ n left
                                     | otherwise -> left +++ (takeJ (n - sizeL) right)
+
+scoreLine :: String -> JoinList Score String
+scoreLine s = Single (scoreString s) s
 
 --E4

@@ -21,6 +21,7 @@ score = helper letterScores
 
 --looks up every letter every time, regardless of uniqueness
 scoreString :: String -> Score
-scoreString str = Score $ foldl (\acc -> \(Score s) -> acc + s) 0 $ helper str
-                where helper [] = []
-                      helper (s:ss) = score s : helper ss
+scoreString str = Score $ helper str
+                where helper [] = 0
+                      helper (s:ss) = case score s of
+                                      Score n -> n + helper ss
