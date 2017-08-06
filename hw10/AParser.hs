@@ -1,3 +1,6 @@
+
+import Data.List.Split
+
 newtype Parser a = Parser { runParser :: String -> Maybe (a, String) }
 
 satisfy :: (Char -> Bool) -> Parser Char
@@ -35,3 +38,29 @@ parseName = Parser f
 parsePhone :: Parser String
 parsePhone = Parser f
                 where f _ = Just ("blah", "rest")
+
+-- E3
+
+abParser :: Parser (Char, Char)
+abParser = Parser parse
+              where parse [] = Nothing
+                    parse [x] = Nothing
+                    parse (x:y:zs)
+                      | x == 'a' && y == 'b' = Just((x,y), zs)
+                      | otherwise = Nothing
+
+abParser_ :: Parser ()
+abParser_ = Parser parse
+              where parse [] = Nothing
+                    parse [x] = Nothing
+                    parse (x:y:zs)
+                      | x == 'a' && y == 'b' = Just((), zs)
+                      | otherwise = Nothing
+
+intPair :: Parser [Int]
+intPair = Parser parse
+              where parse ns = case splitOn " " ns of
+                                        [] -> Nothing
+                                        [x] -> Nothing
+                                        x:y:[] -> Just(map (\n -> read n :: Int) [x, y], "")
+                                        _ -> Nothing
