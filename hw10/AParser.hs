@@ -64,3 +64,22 @@ intPair = Parser parse
                                         [x] -> Nothing
                                         x:y:[] -> Just(map (\n -> read n :: Int) [x, y], "")
                                         _ -> Nothing
+
+--E4
+
+class Applicative f => Alternative f where
+  empty :: f a
+  (<|>) :: f a -> f a -> f a
+
+instance Alternative Parser where
+  empty = Parser f
+          where f _ = Nothing
+
+  (<|>) pa pb = Parser parse
+                where parse chr = let outA = runParser pa chr
+                                  in case outA of
+                                    Nothing -> let outB = runParser pb chr
+                                               in case outB of
+                                                    Nothing -> Nothing
+                                                    _ -> outB
+                                    _ -> outA
