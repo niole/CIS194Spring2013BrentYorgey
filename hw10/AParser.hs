@@ -1,5 +1,5 @@
-
 import Data.List.Split
+import Data.Char
 
 newtype Parser a = Parser { runParser :: String -> Maybe (a, String) }
 
@@ -83,3 +83,36 @@ instance Alternative Parser where
                                                     Nothing -> Nothing
                                                     _ -> outB
                                     _ -> outA
+
+
+--E5
+
+isInt :: Char -> Bool
+isInt c = case c of
+                '0' -> True
+                '1' -> True
+                '2' -> True
+                '3' -> True
+                '4' -> True
+                '5' -> True
+                '6' -> True
+                '7' -> True
+                '8' -> True
+                '9' -> True
+                _ -> False
+
+parseFirst :: (Char -> Bool) -> Parser ()
+parseFirst check = Parser f
+        where f [] = Nothing
+              f (x:xs)
+                | check x = Just ((), xs)
+                | otherwise = Nothing
+
+parseInt :: Parser ()
+parseInt = parseFirst isInt
+
+parseUpperCase :: Parser ()
+parseUpperCase = parseFirst isUpper
+
+intOrUppercase :: Parser ()
+intOrUppercase = parseUpperCase <|> parseInt
