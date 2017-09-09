@@ -57,11 +57,13 @@ parseClosedParen :: Parser Char
 parseClosedParen = char ')'
 
 parseAtom :: Parser Atom
-parseAtom = ident <|> posInt
+parseAtom = toIdent <$> ident <|> toNum <$> posInt
+        where toIdent s = I s
+              toNum n = N n
 
-parseSExpList :: Parser [SExpr]
-parseSExpList = joiner <$> parseOpenParen <*> spaces <*> parseAtom <*> spaces <*> parseClosedParen
-                 where joiner = (\a -> \b -> \c -> \d -> \e -> a : b ++ (c : d ++ [e]))
-
-parseSExpr :: Parser SExpr
-parseSExpr = parseAtom <|> parseSExpList
+--parseSExpList :: Parser [SExpr]
+--parseSExpList = joiner <$> parseOpenParen <*> spaces <*> parseAtom <*> spaces <*> parseClosedParen
+--                 where joiner a b c d e = a : b ++ (c : d ++ [e])
+--
+--parseSExpr :: Parser SExpr
+--parseSExpr = parseAtom <|> parseSExpList
