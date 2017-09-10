@@ -50,18 +50,6 @@ data SExpr = A Atom
            | Comb [SExpr]
   deriving Show
 
-ignoreFirst :: a -> b -> b
-ignoreFirst sps toKeep = toKeep
-
-ignoreSecond :: a -> b -> a
-ignoreSecond toKeep other = toKeep
-
-ignoreParser :: Parser b -> Parser a -> Parser a
-ignoreParser o p = liftA2 ignoreFirst o p
-
-ignoreEndParser :: Parser a -> Parser b -> Parser a
-ignoreEndParser o p = liftA2 ignoreSecond o p
-
 parseOpenParen :: Parser Char
 parseOpenParen = char '('
 
@@ -69,8 +57,8 @@ appendChar :: String -> Char -> String
 appendChar s c = s ++ [c]
 
 parseWParens :: Parser SExpr
-parseWParens = parseStart $ ignoreEndParser (oneOrMoreParseSExprs parseMiddle) parseEnd
-               where parseStart p = ignoreParser (liftA2 appendChar spaces parseOpenParen) p
+parseWParens = parseStart $ oneOrMoreParseSExprs parseMiddle <* parseEnd
+               where parseStart p = liftA2 appendChar spaces parseOpenParen *> p
                      parseMiddle =
                        combineSExprParsers
                                 (combineSExprParsers (optionalParseSExprs parseAtoms) parseWParens)
@@ -109,4 +97,4 @@ parseAtom = toIdent <$> ident <|> toNum <$> posInt
               toNum n = N n
 
 parseAtoms :: Parser SExpr
-parseAtoms = asComb <$> (oneOrMore $ ignoreParser spaces parseAtom)
+parseAtoms = asComb <$> (oneOrMore $ spaces *> parseAtom)
