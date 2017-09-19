@@ -65,5 +65,11 @@ getLosses subbs = f
                                 | a < d = (al + 1, dl)
                                 | otherwise = (al, dl)
 
+-- E2
+
 battle :: Battlefield -> Rand StdGen Battlefield
 battle b = getLosses (getSubbattles b) b
+
+-- E3
+
+invade :: Battlefield -> Rand StdGen Battlefield
