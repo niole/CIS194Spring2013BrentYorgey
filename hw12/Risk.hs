@@ -28,6 +28,7 @@ die = getRandom
 type Army = Int
 
 data Battlefield = Battlefield { attackers :: Army, defenders :: Army }
+  deriving (Show)
 
 concatRolls :: Rand StdGen [DieValue] -> Rand StdGen [DieValue] -> Rand StdGen [DieValue]
 concatRolls a b = do
@@ -73,3 +74,9 @@ battle b = getLosses (getSubbattles b) b
 -- E3
 
 invade :: Battlefield -> Rand StdGen Battlefield
+invade b = do
+  Battlefield a d <- battle b
+  invadeNext a d
+        where invadeNext a d
+                | a < 2 || d <= 0 = return $ Battlefield a d
+                |otherwise = invade $ Battlefield a d
