@@ -80,3 +80,27 @@ invade b = do
         where invadeNext a d
                 | a < 2 || d <= 0 = return $ Battlefield a d
                 |otherwise = invade $ Battlefield a d
+
+--E4
+
+getProb :: Int -> Double
+getProb n
+  | n == 0 = fromIntegral(0)
+  | otherwise = fromIntegral(n `div` 1000)
+
+getWin :: Battlefield -> Int
+getWin (Battlefield _ d)
+  | d <= 0 = 1
+  | otherwise = 0
+
+successProb :: Battlefield -> Rand StdGen Double
+successProb b = getProb <$> ((foldl agg 0) <$> run 1000 b)
+                where agg a c = a + (getWin c)
+
+run :: Int -> Battlefield -> Rand StdGen [Battlefield]
+run 0 _ = return []
+run n b = add (invade b) $ run (n-1) b
+        where add a c = do
+                      battle <- a
+                      battles <- c
+                      return $ battle : battles
