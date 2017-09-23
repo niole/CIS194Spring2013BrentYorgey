@@ -86,16 +86,16 @@ invade b = do
 getProb :: Int -> Double
 getProb n
   | n == 0 = fromIntegral(0)
-  | otherwise = fromIntegral(n `div` 1000)
+  | otherwise = fromIntegral(n) / fromIntegral(1000)
 
-getWin :: Battlefield -> Int
-getWin (Battlefield _ d)
-  | d <= 0 = 1
+getAttackerWin :: Battlefield -> Int
+getAttackerWin (Battlefield a d)
+  | d <= 0 && a > 1 = 1
   | otherwise = 0
 
 successProb :: Battlefield -> Rand StdGen Double
 successProb b = getProb <$> ((foldl agg 0) <$> run 1000 b)
-                where agg a c = a + (getWin c)
+                where agg a c = a + (getAttackerWin c)
 
 run :: Int -> Battlefield -> Rand StdGen [Battlefield]
 run 0 _ = return []
